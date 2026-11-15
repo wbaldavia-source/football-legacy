@@ -105,6 +105,7 @@ function simulate(){
  const nextBalance=game.mode==="director"?(nextFinance?.cash??game.balance):game.balance+(game.mode==="player"||game.mode==="manager"?game.salary:0);
  setGame({...game,round:nextRound,fixtures:game.fixtures.map(f=>playedFixtures.find(x=>x.id===f.id)||f),
   table:rows,stats:st,last,balance:nextBalance,clubFinance:nextFinance,stadium:nextStadium,
+  youthPlayers:(game.youthPlayers||[]).map(y=>({...y,overall:Math.min(y.potential,y.overall+(y.overall<y.potential&&Math.random()<.1?1:0)),morale:Math.max(20,Math.min(100,y.morale+(Math.random()<.5?1:-1)))})),
   overall:development?.overall??game.overall,attributes:development?.attributes??game.attributes,
   trainingLoad:development?.trainingLoad??game.trainingLoad,injuryDays:development?.injuryDays??game.injuryDays,
   morale:Math.max(10,Math.min(100,game.morale+(careerWon?3:careerDraw?1:-3))),
