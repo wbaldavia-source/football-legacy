@@ -1,7 +1,9 @@
-name: Deploy FOOTBALL LEGACY to GitHub Pages
+name: Deploy FOOTBALL LEGACY test build to GitHub Pages
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - rebuild/real-world-engine
   workflow_dispatch:
 permissions:
   contents: read
