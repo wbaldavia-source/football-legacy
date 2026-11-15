@@ -25,6 +25,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Synchronize real football data and current squads
+        continue-on-error: true
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
           API_FOOTBALL_MAX_REQUESTS: "40"
