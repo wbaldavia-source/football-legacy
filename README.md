@@ -1,98 +1,32 @@
+# FOOTBALL LEGACY – World Career
 
-# ⚽ FOOTBALL LEGACY — WORLD CAREER
+Starter de desenvolvimento para um simulador web de carreira de futebol masculino.
 
-**Construa sua história. Conquiste seu espaço. Deixe seu legado.**
+## Requisitos
+- Node.js 20+
+- npm 10+
 
-Football Legacy é um jogo de gerenciamento e carreira futebolística, desenvolvido para navegadores de celular e computador.
-
-## 🎮 MODOS DE JOGO
-
-### Carreira de Jogador
-- Criação personalizada de jogador.
-- Escolha de posição, idade, nacionalidade e características físicas.
-- Evolução de atributos e desempenho.
-- Propostas e transferências.
-- Salários, contratos e patrocínios.
-- Lesões, convocações e decisões pessoais.
-- Relacionamento com clubes, treinadores e torcida.
-
-### Carreira de Treinador
-- Criação de treinador.
-- Escolha de clube.
-- Formação tática e escalação.
-- Treinamentos e desenvolvimento do elenco.
-- Contratações e negociações.
-- Gestão financeira e relacionamento com a diretoria.
-- Renovação e demissão.
-
-## 🌎 UNIVERSO DO FUTEBOL
-- Ligas nacionais e internacionais.
-- Campeonatos estaduais e nacionais.
-- Copas nacionais e continentais.
-- Calendário de temporadas.
-- Classificações e estatísticas.
-- Promoções e rebaixamentos.
-
-## 🔄 SISTEMA DINÂMICO
-- Mercado de transferências.
-- Propostas e contrapropostas.
-- Decisões com consequências.
-- Eventos e notícias.
-- Evolução de jogadores e treinadores.
-- Histórico de temporadas.
-
-## 🏆 CONQUISTAS
-- Títulos individuais e coletivos.
-- Estatísticas da carreira.
-- Recordes.
-- Histórico profissional.
-- Cards compartilháveis.
-
-## 🛠️ TECNOLOGIAS
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
-- Supabase (persistência e autenticação, quando integrado)
-
-## 📱 PLATAFORMAS
-- Android — navegador.
-- iOS — navegador.
-- Computadores — navegador.
-- Preparação para instalação como PWA.
-
-## 🚀 EXECUÇÃO LOCAL
-
-Requisitos: Node.js 18 ou superior.
-
-Instale as dependências:
-
+## Executar localmente
 ```bash
 npm install
-```
-
-Inicie o projeto:
-
-```bash
 npm run dev
 ```
+Abra http://localhost:3000.
 
-Acesse:
+## Estado desta entrega
+Esta é a fundação funcional do projeto: dashboard responsivo, escolha de carreira, decisões com efeitos em atributos/reputação, calendário de temporada simulado e base de tipos para jogadores, treinadores, clubes, ligas e transferências.
 
-http://localhost:3000
+Ainda não contém base mundial licenciada, autenticação, persistência em nuvem, fotos comerciais ou simulação completa de todas as ligas. Esses recursos exigem integração de dados, infraestrutura e licenças apropriadas. As imagens de jogadores reais não são incluídas sem autorização.
 
-## 🌐 PUBLICAÇÃO
+## Próximas integrações
+1. Criar projeto Supabase e preencher `.env.local`.
+2. Implementar autenticação e persistência das carreiras.
+3. Importar dados de competições e clubes de fontes licenciadas/abertas, respeitando termos de uso.
+4. Contratar/licenciar fotos e dados de atletas/técnicos.
+5. Expandir motor de partidas, calendário, finanças, contratos, IA de clubes e mercado.
+6. Deploy na Vercel.
 
-O projeto pode ser publicado pela Vercel, conectando este repositório GitHub.
-
-Framework: Next.js.
-
-## 📌 STATUS DO PROJETO
-
-Em desenvolvimento.
-
-As funcionalidades descritas representam os objetivos do projeto e serão liberadas progressivamente. Dados, competições e recursos externos dependerão de integração e licenciamento apropriados.
-
-## 📄 LICENÇA
-
-Projeto em desenvolvimento. Direitos de uso e distribuição serão definidos pelo proprietário.
+## Estrutura
+- `app/`: interface Next.js.
+- `src/engine/`: regras de carreira e simulação.
+- `src/data/`: dados demonstrativos, substituíveis por provedores licenciados.
