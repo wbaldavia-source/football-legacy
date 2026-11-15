@@ -1,3 +1,4 @@
+/* test */
 "use client";
 import {useEffect,useMemo,useState} from "react";
 import {newCareer,money,bounded} from "@/engine/career";
