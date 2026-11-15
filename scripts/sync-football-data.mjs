@@ -35,6 +35,7 @@ const targets = [
   ["Saudi Arabia", ["Pro League"]],
   ["South Africa", ["Premier Soccer League"]]
 ];
+const warnings = [];
 let available;
 try {
   available = await api("/leagues?season=" + seasonPreference);
@@ -46,7 +47,6 @@ try {
   } else throw error;
 }
 const selected = [];
-const warnings = [];
 for (const [country, aliases] of targets) {
   const match = available.find(x => norm(x.country?.name) === norm(country) &&
     aliases.some(a => norm(x.league?.name) === norm(a)));
