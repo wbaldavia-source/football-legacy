@@ -38,7 +38,7 @@ const raw=[
 ];
 const fallbackClubs:Club[]=raw.map(x=>({id:String(x[0]),name:String(x[1]),country:String(x[2]),league:String(x[3]),budget:Number(x[4]),stadium:String(x[5]),capacity:Number(x[6]),fans:1000000}));
 const syncedClubs:Club[]=(liveFootball.teams||[]).map((t:any)=>({
- id:"api-"+String(t.id),name:String(t.name),country:String(t.country),
+ id:"api-"+String(t.id),name:String(t.name),country:String(t.country)==="Brazil"?"Brasil":String(t.country),
  league:String(t.country)==="Brazil"&&String(t.league).toLowerCase()==="serie a"?"Série A":String(t.league),
  budget:50000000,stadium:String(t.stadium||"Estádio a definir"),
  capacity:Number(t.capacity||20000),fans:250000
