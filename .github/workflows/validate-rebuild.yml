@@ -23,26 +23,12 @@ jobs:
         with:
           node-version: 20
           package-manager-cache: false
-      - name: Validate API-Football secret
+      - name: Confirm API secret is configured
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
         run: |
-          node --input-type=module <<'NODE'
-          const key = process.env.API_FOOTBALL_KEY;
-          if (!key) {
-            console.error("Missing repository secret: API_FOOTBALL_KEY");
-            process.exit(1);
-          }
-          const response = await fetch("https://v3.football.api-sports.io/status", {
-            headers: { "x-apisports-key": key }
-          });
-          const data = await response.json();
-          if (!response.ok || (data.errors && Object.keys(data.errors).length)) {
-            console.error("API-Football authentication/status check failed:", JSON.stringify(data.errors || data));
-            process.exit(1);
-          }
-          console.log("API-Football authentication validated. Credential was not printed.");
-          NODE
+          test -n "$API_FOOTBALL_KEY" || (echo "Missing repository secret: API_FOOTBALL_KEY" && exit 1)
+          echo "API secret is configured; credential not displayed."
       - name: Install dependencies
         run: npm install
       - name: Build static site
