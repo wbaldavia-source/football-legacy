@@ -82,3 +82,16 @@ G. Compartilhamento, testes, otimização e lançamento.
 
 ### 16. Fora do escopo inicial
 Partidas 3D controláveis, transmissão audiovisual, multiplayer síncrono e reprodução de marcas/escudos sem licença. O foco é simulação de carreira e gerenciamento.
+
+
+### 17. Modo dirigente (requisito do produto)
+Carreira própria de diretor de futebol: planejamento de elenco, contratações e dispensas de atletas e treinadores, comissão técnica, negociações, contratos, empréstimos, orçamento, fluxo de caixa, patrocínios, bilheteria, folha salarial, dívidas, juros e metas esportivas/financeiras. A IA dos clubes deve negociar entre si e reagir à situação econômica e esportiva.
+
+### 18. Categorias de base
+Estrutura Sub-15, Sub-17 e Sub-20 com captação, olheiros, avaliações, relatórios de potencial, treinadores, infraestrutura, competições, evolução, promoção ao profissional e empréstimos. Dados de atletas reais só poderão ser incluídos após verificação de fonte, atualidade, privacidade e direitos de uso. A demonstração atual usa nomes fictícios.
+
+### 19. Administração do estádio
+Gestão de capacidade, ocupação, setores, preços de ingressos, meia-entrada, gratuidades, sócios, camarotes, bilheteria, limpeza, resíduos, segurança, acessibilidade, gramado, iluminação, banheiros, manutenção, reformas e ampliação. Custos e preços devem impactar caixa, satisfação e conservação.
+
+### 20. Salvamento e validação
+O build 0.2.0 usa armazenamento local do navegador apenas. Antes de chamar uma versão de completa, validar build de produção, testes unitários do motor, persistência, regras de mercado, calendário, simulação de partidas, finanças e responsividade em Android e desktop.
