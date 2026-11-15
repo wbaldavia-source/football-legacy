@@ -99,8 +99,8 @@ export function improveStadium(stadium:Stadium,area:"cleanliness"|"security"|"ac
 
 export type YouthPlayer={id:string;name:string;age:number;position:Position;overall:number;potential:number;morale:number;level:"U15"|"U17"|"U20"|"senior";contracted:boolean};
 export function promoteYouth(player:YouthPlayer):YouthPlayer{
-  const level=player.age>=20?"senior":player.age>=17?"U20":player.age>=15?"U17":"U15";
-  return {...player,level,contracted:true};
+  const level=player.age>=20?"senior":player.age>=18?"U20":player.age>=16?"U17":"U15";
+  return {...player,level,contracted:player.age>=16};
 }
 export function scoutYouth(id:string,name:string,age:number,position:Position,scoutingLevel:number,random=Math.random):YouthPlayer{
   const potential=clamp(55+Math.floor(random()*25)+scoutingLevel*2,50,95);
