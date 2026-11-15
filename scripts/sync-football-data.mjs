@@ -4,13 +4,23 @@ const key = process.env.API_FOOTBALL_KEY;
 if (!key) throw new Error("API_FOOTBALL_KEY ausente. Configure o secret do repositório.");
 const base = "https://v3.football.api-sports.io";
 let requests = 0;
+let lastRequestAt = 0;
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 const MAX_REQUESTS = Number(process.env.API_FOOTBALL_MAX_REQUESTS || 40);
 let seasonPreference = Number(process.env.FOOTBALL_SEASON || 2026);
 async function api(path) {
   if (requests >= MAX_REQUESTS) throw new Error("Limite de segurança de chamadas atingido.");
+  const elapsed = Date.now() - lastRequestAt;
+  if (lastRequestAt && elapsed < 6500) await wait(6500 - elapsed);
   requests++;
-  const response = await fetch(base + path, { headers: { "x-apisports-key": key } });
-  const body = await response.json();
+  let response = await fetch(base + path, { headers: { "x-apisports-key": key } });
+  let body = await response.json();
+  if (body.errors?.rateLimit) {
+    await wait(65000);
+    response = await fetch(base + path, { headers: { "x-apisports-key": key } });
+    body = await response.json();
+  }
+  lastRequestAt = Date.now();
   if (!response.ok || (body.errors && Object.keys(body.errors).length)) {
     throw new Error("API-Football (" + response.status + "): " + JSON.stringify(body.errors || body));
   }
