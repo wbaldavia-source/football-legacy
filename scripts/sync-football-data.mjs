@@ -5,7 +5,7 @@ if (!key) throw new Error("API_FOOTBALL_KEY ausente. Configure o secret do repos
 const base = "https://v3.football.api-sports.io";
 let requests = 0;
 const MAX_REQUESTS = Number(process.env.API_FOOTBALL_MAX_REQUESTS || 40);
-const seasonPreference = Number(process.env.FOOTBALL_SEASON || 2026);
+let seasonPreference = Number(process.env.FOOTBALL_SEASON || 2026);
 async function api(path) {
   if (requests >= MAX_REQUESTS) throw new Error("Limite de segurança de chamadas atingido.");
   requests++;
@@ -35,7 +35,16 @@ const targets = [
   ["Saudi Arabia", ["Pro League"]],
   ["South Africa", ["Premier Soccer League"]]
 ];
-const available = await api("/leagues?season=" + seasonPreference);
+let available;
+try {
+  available = await api("/leagues?season=" + seasonPreference);
+} catch (error) {
+  if (seasonPreference > 2024 && /Free plans do not have access to this season/i.test(error.message)) {
+    seasonPreference = 2024;
+    warnings.push("Plano gratuito limita competições às temporadas 2022–2024; usando 2024 como base histórica.");
+    available = await api("/leagues?season=" + seasonPreference);
+  } else throw error;
+}
 const selected = [];
 const warnings = [];
 for (const [country, aliases] of targets) {
