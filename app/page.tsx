@@ -34,29 +34,82 @@ function start(){if(mode==="player"&&(!Number.isFinite(Number(age))||Number(age)
 academyCategory:mode==="player"?category(Number(age)):undefined,
 clubFinance:mode==="director"?{cash:c.budget,debt:0,weeklyWageBill:Math.round(c.budget*0.0018),transferBudget:Math.round(c.budget*0.22),reputation:60,boardConfidence:65}:undefined,
 stadium:mode==="director"?{capacity:c.capacity,ticketPrice:65,maintenance:300000,cleanliness:85,security:75,accessibility:65,pitchQuality:80}:undefined});setTab("Painel");setNotice("Carreira criada com calendário completo de 38 rodadas e 380 partidas.");}
-function simulate(){if(!game)return;if(game.round>=38){setNotice("Temporada concluída. Encerre a temporada para iniciar a próxima.");return;}const rows=game.table.map(r=>({...r}));const pending=game.fixtures.filter(f=>f.round===game.round+1&&f.status==="scheduled");const playedFixtures=pending.map(f=>{const h=clubs.find(c=>c.id===f.homeId),a=clubs.find(c=>c.id===f.awayId);if(!h||!a)return f;const chosen=FORMATIONS.find(x=>x.id===game.formationId);const attackers=chosen?chosen.slots.filter(p=>["ST","LW","RW","AM"].includes(p)).length:3;const midfielders=chosen?chosen.slots.filter(p=>["DM","CM","AM","LM","RM"].includes(p)).length:3;const defenders=chosen?chosen.slots.filter(p=>["CB","LB","RB","LWB","RWB"].includes(p)).length:4;const tacticalBonus=game.mode==="manager"&&chosen?Math.max(-2.5,Math.min(2.5,(attackers-3)*1.1+(midfielders-3)*.35+(defenders-4)*.25)):0;const homeBoost=h.name===game.club?tacticalBonus:0;const awayBoost=a.name===game.club?tacticalBonus:0;return simulateFixture(f,{id:h.id,name:h.name,strength:65+h.budget/10000000+homeBoost},{id:a.id,name:a.name,strength:65+a.budget/10000000+awayBoost});});let myGF=0,myGA=0;for(const f of playedFixtures){const home=rows.find(r=>r.club===clubs.find(c=>c.id===f.homeId)?.name),away=rows.find(r=>r.club===clubs.find(c=>c.id===f.awayId)?.name);if(!home||!away||f.homeGoals===undefined||f.awayGoals===undefined)continue;const hg=f.homeGoals,ag=f.awayGoals;for(const [r,g,o] of [[home,hg,ag],[away,ag,hg]] as [Row,number,number][]){r.pj++;r.gp+=g;r.gc+=o;if(g>o){r.v++;r.pts+=3}else if(g===o){r.e++;r.pts++}else r.d++;}if(f.homeId===clubs.find(c=>c.name===game.club)?.id){myGF=hg;myGA=ag;}else if(f.awayId===clubs.find(c=>c.name===game.club)?.id){myGF=ag;myGA=hg;}}const won=myGF>myGA,draw=myGF===myGA;
-const youthCareer=game.mode==="player"&&game.age<20;
-const playerWin=youthCareer?Math.random()<.45:won;
-const playerDraw=youthCareer?Math.random()<.27:draw;
-const careerWon=game.mode==="player"?playerWin:won,careerDraw=game.mode==="player"?playerDraw:draw;
-const performance=6+Math.random()*3.4;const attack=["ST","LW","RW","AM"].includes(game.position);const scored=game.mode==="player"?(attack&&Math.random()<.38?1:Math.random()<.12?1:0):0;const assisted=game.mode==="player"&&Math.random()<.24?1:0;const st={...game.stats,apps:game.stats.apps+1,wins:game.stats.wins+((game.mode==="player"?playerWin:won)?1:0),draws:game.stats.draws+((game.mode==="player"?playerDraw:draw)?1:0),losses:game.stats.losses+(!(game.mode==="player"?playerWin:won)&&!(game.mode==="player"?playerDraw:draw)?1:0),goals:game.stats.goals+scored,assists:game.stats.assists+assisted,minutes:game.stats.minutes+90,yellow:game.stats.yellow+(Math.random()<.13?1:0),red:game.stats.red+(Math.random()<.015?1:0),rating:game.stats.rating+performance,points:game.stats.points+(careerWon?3:careerDraw?1:0),attendance:game.stats.attendance+Math.floor(18000+Math.random()*36000)};let income=0,expense=0,nextFinance=game.clubFinance,nextStadium=game.stadium;
-if(game.mode==="director"&&game.clubFinance&&game.stadium){
- const day=runMatchday({...game.stadium,ticketPrice:game.ticket},game.stadium.capacity*0.68);
- const sponsor=Math.round(current.budget/52*0.12);
- income=day.revenue+sponsor;
- expense=day.cost+game.clubFinance.weeklyWageBill;
- nextFinance=postFinance(game.clubFinance,{id:"gate-"+game.season+"-"+nextRound,season:game.season,category:"ticketing",amount:day.revenue,description:"Bilheteria da rodada"});
- nextFinance=postFinance(nextFinance,{id:"sponsor-"+game.season+"-"+nextRound,season:game.season,category:"sponsor",amount:sponsor,description:"Receita comercial proporcional"});
- nextFinance=postFinance(nextFinance,{id:"cost-"+game.season+"-"+nextRound,season:game.season,category:"other",amount:-expense,description:"Folha semanal e operação do estádio"});
- nextStadium=day.next;
+function simulate(){
+ if(!game)return;
+ if(game.round>=38){setNotice("Temporada concluída. Encerre a temporada para iniciar a próxima.");return;}
+ const rows=game.table.map(r=>({...r}));
+ const pending=game.fixtures.filter(f=>f.round===game.round+1&&f.status==="scheduled");
+ const playedFixtures=pending.map(f=>{
+  const h=clubs.find(c=>c.id===f.homeId),a=clubs.find(c=>c.id===f.awayId);
+  if(!h||!a)return f;
+  const chosen=FORMATIONS.find(x=>x.id===game.formationId);
+  const attackers=chosen?chosen.slots.filter(p=>["ST","LW","RW","AM"].includes(p)).length:3;
+  const midfielders=chosen?chosen.slots.filter(p=>["DM","CM","AM","LM","RM"].includes(p)).length:3;
+  const defenders=chosen?chosen.slots.filter(p=>["CB","LB","RB","LWB","RWB"].includes(p)).length:4;
+  const tacticalBonus=game.mode==="manager"&&chosen?Math.max(-2.5,Math.min(2.5,(attackers-3)*1.1+(midfielders-3)*.35+(defenders-4)*.25)):0;
+  return simulateFixture(f,
+   {id:h.id,name:h.name,strength:65+h.budget/10000000+(h.name===game.club?tacticalBonus:0)},
+   {id:a.id,name:a.name,strength:65+a.budget/10000000+(a.name===game.club?tacticalBonus:0)});
+ });
+ let myGF=0,myGA=0;
+ for(const f of playedFixtures){
+  const home=rows.find(r=>r.club===clubs.find(c=>c.id===f.homeId)?.name);
+  const away=rows.find(r=>r.club===clubs.find(c=>c.id===f.awayId)?.name);
+  if(!home||!away||f.homeGoals===undefined||f.awayGoals===undefined)continue;
+  const hg=f.homeGoals,ag=f.awayGoals;
+  for(const [r,g,o] of [[home,hg,ag],[away,ag,hg]] as [Row,number,number][]){
+   r.pj++;r.gp+=g;r.gc+=o;if(g>o){r.v++;r.pts+=3}else if(g===o){r.e++;r.pts++}else r.d++;
+  }
+  if(f.homeId===clubs.find(c=>c.name===game.club)?.id){myGF=hg;myGA=ag;}
+  else if(f.awayId===clubs.find(c=>c.name===game.club)?.id){myGF=ag;myGA=hg;}
+ }
+ const nextRound=game.round+1;
+ const won=myGF>myGA,draw=myGF===myGA;
+ const youthCareer=game.mode==="player"&&game.age<20;
+ const playerWin=youthCareer?Math.random()<.45:won;
+ const playerDraw=youthCareer?Math.random()<.27:draw;
+ const careerWon=game.mode==="player"?playerWin:won;
+ const careerDraw=game.mode==="player"?playerDraw:draw;
+ const performance=6+Math.random()*3.4;
+ const attack=["ST","LW","RW","AM"].includes(game.position);
+ const scored=game.mode==="player"?(attack&&Math.random()<.38?1:Math.random()<.12?1:0):0;
+ const assisted=game.mode==="player"&&Math.random()<.24?1:0;
+ const st={...game.stats,apps:game.stats.apps+1,
+  wins:game.stats.wins+(careerWon?1:0),draws:game.stats.draws+(careerDraw?1:0),
+  losses:game.stats.losses+(!careerWon&&!careerDraw?1:0),goals:game.stats.goals+scored,
+  assists:game.stats.assists+assisted,minutes:game.stats.minutes+90,
+  yellow:game.stats.yellow+(Math.random()<.13?1:0),red:game.stats.red+(Math.random()<.015?1:0),
+  rating:game.stats.rating+performance,points:game.stats.points+(careerWon?3:careerDraw?1:0),
+  attendance:game.stats.attendance};
+ let income=0,expense=0,matchAttendance=0,nextFinance=game.clubFinance,nextStadium=game.stadium;
+ if(game.mode==="director"&&game.clubFinance&&game.stadium){
+  const day=runMatchday({...game.stadium,ticketPrice:game.ticket},game.stadium.capacity*.68);
+  const sponsor=Math.round(current.budget/52*.12);
+  income=day.revenue+sponsor;expense=day.cost+game.clubFinance.weeklyWageBill;matchAttendance=day.attendance;
+  nextFinance=postFinance(game.clubFinance,{id:"gate-"+game.season+"-"+nextRound,season:game.season,category:"ticketing",amount:day.revenue,description:"Bilheteria da rodada"});
+  nextFinance=postFinance(nextFinance,{id:"sponsor-"+game.season+"-"+nextRound,season:game.season,category:"sponsor",amount:sponsor,description:"Receita comercial proporcional"});
+  nextFinance=postFinance(nextFinance,{id:"cost-"+game.season+"-"+nextRound,season:game.season,category:"other",amount:-expense,description:"Folha semanal e operação do estádio"});
+  nextStadium=day.next;
+ }
+ st.revenue+=income;st.expenses+=expense;
+ if(game.mode==="director")st.attendance+=matchAttendance;
+ const last=youthCareer
+  ?game.name+" · "+(game.academyCategory||category(game.age))+" · "+(careerWon?"Vitória":careerDraw?"Empate":"Derrota")
+  :game.club+" "+myGF+" x "+myGA+" · "+(won?"Vitória":draw?"Empate":"Derrota");
+ const development=game.mode==="player"?developPlayer({
+  overall:game.overall,potential:88,age:game.age,morale:game.morale,
+  attributes:game.attributes||{pace:game.overall+5,shooting:game.overall+4,passing:game.overall,dribbling:game.overall+2,defending:game.overall-8,physical:game.overall+3,goalkeeping:game.overall-20},
+  trainingLoad:game.trainingLoad||0,injuryDays:game.injuryDays||0
+ },game.position,"balanced").player:null;
+ const nextBalance=game.mode==="director"?(nextFinance?.cash??game.balance):game.balance+(game.mode==="player"||game.mode==="manager"?game.salary:0);
+ setGame({...game,round:nextRound,fixtures:game.fixtures.map(f=>playedFixtures.find(x=>x.id===f.id)||f),
+  table:rows,stats:st,last,balance:nextBalance,clubFinance:nextFinance,stadium:nextStadium,
+  overall:development?.overall??game.overall,attributes:development?.attributes??game.attributes,
+  trainingLoad:development?.trainingLoad??game.trainingLoad,injuryDays:development?.injuryDays??game.injuryDays,
+  morale:Math.max(10,Math.min(100,game.morale+(careerWon?3:careerDraw?1:-3))),
+  history:[game.season+" · Rodada "+nextRound+" · "+last,...game.history].slice(0,150)});
+ setNotice(youthCareer?"Partida da categoria "+(game.academyCategory||category(game.age))+" concluída. Evolução acompanhada pela comissão técnica.":"Rodada "+nextRound+"/38 concluída. Foram disputadas "+playedFixtures.length+" partidas.");
 }
-st.revenue+=income;st.expenses+=expense;st.cleanliness=Math.max(20,Math.min(100,st.cleanliness+(Math.random()>.5?1:-2)));const last=youthCareer?(game.name+" · "+(game.academyCategory||category(game.age))+" · "+(careerWon?"Vitória":careerDraw?"Empate":"Derrota")):(game.club+" "+myGF+" x "+myGA+" · "+(won?"Vitória":draw?"Empate":"Derrota"));const nextRound=game.round+1;const youthCareer=game.mode==="player"&&game.age<20;
-const playerWin=youthCareer?Math.random()<.45:won;
-const playerDraw=youthCareer?Math.random()<.27:draw;
-const development=game.mode==="player"?developPlayer({overall:game.overall,potential:88,age:game.age,morale:game.morale,attributes:game.attributes||{pace:game.overall+5,shooting:game.overall+4,passing:game.overall,dribbling:game.overall+2,defending:game.overall-8,physical:game.overall+3,goalkeeping:game.overall-20},trainingLoad:game.trainingLoad||0,injuryDays:game.injuryDays||0},game.position,"balanced").player:null;
-setGame({...game,round:nextRound,fixtures:game.fixtures.map(f=>playedFixtures.find(p=>p.id===f.id)||f),table:rows,stats:st,last,balance:game.mode==="director"?(nextFinance?.cash??game.balance):game.balance+6500,clubFinance:nextFinance,stadium:nextStadium,
-overall:development?.overall??game.overall,attributes:development?.attributes??game.attributes,trainingLoad:development?.trainingLoad??game.trainingLoad,injuryDays:development?.injuryDays??game.injuryDays,
-morale:Math.max(10,Math.min(100,game.morale+(careerWon?3:careerDraw?1:-3))),history:[game.season+" · Rodada "+nextRound+" · "+last,...game.history].slice(0,150)});setNotice("Rodada "+nextRound+"/38 concluída. Foram disputadas "+playedFixtures.length+" partidas oficiais da simulação.");}
 function transfer(to:string){if(!game)return;const fee=2500000+Math.floor(Math.random()*9000000);const st={...game.stats,transfersIn:game.stats.transfersIn+1,spent:game.stats.spent+fee};setGame({...game,club:to,stats:st,balance:game.mode==="director"?game.balance-fee:game.balance,history:[game.season+" · "+(game.mode==="director"?"Contratação":"Mudança de clube")+" para "+to+" · "+money(fee),...game.history]});setNotice("Movimentação registrada no histórico da carreira.");}
 function nextSeason(){if(!game)return;if(game.round<38){setNotice("Ainda existem rodadas pendentes. Conclua as 38 rodadas antes de avançar.");return;}const champion=sorted[0]?.club===game.club;const st={...game.stats,titles:game.stats.titles+(champion?1:0)};const fixtures=createDoubleRoundRobin(br.map(x=>({id:x.id,name:x.name,strength:65+(x.budget/10000000)})),"br-serie-a",game.season+1);setGame({...game,season:game.season+1,round:0,table:table0(),fixtures,stats:st,age:game.mode==="player"?game.age+1:game.age,academyCategory:game.mode==="player"?category(game.age+1):game.academyCategory,
 salary:game.mode==="player"&&game.age===15?1800:game.salary,contractYears:game.mode==="player"&&game.age===15?2:game.contractYears,
