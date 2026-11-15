@@ -1,0 +1,35 @@
+name: Validate FOOTBALL LEGACY rebuild
+
+on:
+  push:
+    branches:
+      - rebuild/real-world-engine
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          package-manager-cache: false
+      - name: Confirm API secret is configured
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          test -n "$API_FOOTBALL_KEY" || (echo "Missing repository secret: API_FOOTBALL_KEY" && exit 1)
+          echo "API secret is configured; credential not displayed."
+      - name: Install dependencies
+        run: npm install
+      - name: Build static site
+        run: npm run build

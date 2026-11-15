@@ -1,7 +1,9 @@
-name: Deploy FOOTBALL LEGACY to GitHub Pages
+name: Deploy FOOTBALL LEGACY test build to GitHub Pages
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - rebuild/real-world-engine
   workflow_dispatch:
 permissions:
   contents: read
@@ -22,6 +24,13 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm install
+      - name: Synchronize real football data and current squads
+        continue-on-error: true
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          API_FOOTBALL_MAX_REQUESTS: "40"
+          FOOTBALL_SEASON: "2026"
+        run: node scripts/sync-football-data.mjs
       - name: Build static website
         run: npm run build
       - name: Upload Pages artifact
