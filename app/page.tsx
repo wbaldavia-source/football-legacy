@@ -78,7 +78,7 @@ function simulate(){
    {id:a.id,name:a.name,strength:65+a.budget/10000000+(a.name===game.club?tacticalBonus:0)});
   if(h.name!==game.club&&a.name!==game.club)return base;
   const ownRoster:MatchAthlete[]=squad.map((p,i)=>({id:"roster-"+i,name:p.n,position:p.p,overall:p.ov||60,fitness:100-(game.trainingLoad||0)*.25,morale:game.morale,age:p.age}));
-  if(game.mode==="player")ownRoster.unshift({id:"career-player",name:game.name,position:game.position,overall:game.overall,fitness:100-(game.trainingLoad||0)*.3,morale:game.morale,age:game.age});
+  if(game.mode==="player")ownRoster.unshift({id:"career-player",name:game.name,position:game.position,overall:game.overall,fitness:100-(game.trainingLoad||0)*.3,morale:game.morale,age:game.age,starter:true});
   const otherRoster:MatchAthlete[]=players.slice(0,18).map((n,i)=>({id:"opponent-"+i,name:n,position:(["GK","CB","CB","LB","RB","DM","CM","CM","AM","LW","RW","ST","ST","CB","CM","ST","LB","RB"] as Position[])[i],overall:58+(i*7)%24,fitness:85,morale:70,age:19+(i%13)}));
   const plan=defaultMatchPlan(game.formationId||"4-2-3-1");
   const report=simulateDetailedMatch({seed:f.seed,homeName:h.name,awayName:a.name,homeStrength:65+h.budget/10000000,awayStrength:65+a.budget/10000000,homeRoster:f.homeId===clubs.find(c=>c.name===game.club)?.id?ownRoster:otherRoster,awayRoster:f.awayId===clubs.find(c=>c.name===game.club)?.id?ownRoster:otherRoster,homePlan:plan,awayPlan:defaultMatchPlan()});
@@ -108,11 +108,11 @@ function simulate(){
  const performance=careerLine?.rating??(6+Math.random()*3.4);
  const scored=game.mode==="player"?(careerLine?.goals??0):0;
  const assisted=game.mode==="player"?(careerLine?.assists??0):0;
- const st={...game.stats,apps:game.stats.apps+1,
+ const st={...game.stats,apps:game.stats.apps+(game.mode==="player"?(careerLine?1:0):1),
   wins:game.stats.wins+(careerWon?1:0),draws:game.stats.draws+(careerDraw?1:0),
   losses:game.stats.losses+(!careerWon&&!careerDraw?1:0),goals:game.stats.goals+scored,
-  assists:game.stats.assists+assisted,minutes:game.stats.minutes+90,
-  yellow:game.stats.yellow+(Math.random()<.13?1:0),red:game.stats.red+(Math.random()<.015?1:0),
+  assists:game.stats.assists+assisted,minutes:game.stats.minutes+(game.mode==="player"?(careerLine?.minutes??0):90),
+  yellow:game.stats.yellow+(game.mode==="player"?(careerLine?.yellowCards??0):(Math.random()<.13?1:0)),red:game.stats.red+(game.mode==="player"?(careerLine?.redCards??0):(Math.random()<.015?1:0)),
   rating:game.stats.rating+performance,points:game.stats.points+(careerWon?3:careerDraw?1:0),
   attendance:game.stats.attendance};
  let income=0,expense=0,matchAttendance=0,nextFinance=game.clubFinance,nextStadium=game.stadium;
