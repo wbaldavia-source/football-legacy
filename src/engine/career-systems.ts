@@ -104,5 +104,5 @@ export function promoteYouth(player:YouthPlayer):YouthPlayer{
 }
 export function scoutYouth(id:string,name:string,age:number,position:Position,scoutingLevel:number,random=Math.random):YouthPlayer{
   const potential=clamp(55+Math.floor(random()*25)+scoutingLevel*2,50,95);
-  return {id,name,age,position,overall:clamp(35+Math.floor(random()*20),25,70),potential,morale:65,level:age>=20?"senior":age>=17?"U20":age>=15?"U17":"U15",contracted:false};
+  return {id,name,age,position,overall:clamp(35+Math.floor(random()*20),25,70),potential,morale:65,level:age>=20?"senior":age>=18?"U20":age>=16?"U17":"U15",contracted:false};
 }
