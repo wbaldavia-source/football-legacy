@@ -10,7 +10,8 @@ type Stats={apps:number;wins:number;draws:number;losses:number;goals:number;assi
 type Row={club:string;pts:number;pj:number;v:number;e:number;d:number;gp:number;gc:number};
 type Save={mode:CareerMode;name:string;age:number;position:Position;club:string;season:number;round:number;overall:number;morale:number;balance:number;stats:Stats;table:Row[];fixtures:Fixture[];history:string[];last:string;salary:number;ticket:number;stadiumLevel:number;formationId:string;attributes?:PlayerAttributes;trainingLoad?:number;injuryDays?:number;contractYears?:number;youthPlayers?:YouthPlayer[];clubFinance?:ClubFinance;stadium?:Stadium;academyCategory?:string};
 const br=clubs.filter(c=>c.country==="Brasil"&&c.league==="Série A");
-const category=(age:number)=>age>=20?"Profissional":age>=18?"Sub-20":age>=16?"Sub-17":"Sub-15";\nconst blank=():Stats=>({apps:0,wins:0,draws:0,losses:0,goals:0,assists:0,minutes:0,yellow:0,red:0,rating:0,points:0,titles:0,transfersIn:0,transfersOut:0,spent:0,earned:0,revenue:0,expenses:0,cleanliness:85,attendance:0});
+const category=(age:number)=>age>=20?"Profissional":age>=18?"Sub-20":age>=16?"Sub-17":"Sub-15";
+const blank=():Stats=>({apps:0,wins:0,draws:0,losses:0,goals:0,assists:0,minutes:0,yellow:0,red:0,rating:0,points:0,titles:0,transfersIn:0,transfersOut:0,spent:0,earned:0,revenue:0,expenses:0,cleanliness:85,attendance:0});
 const table0=():Row[]=>br.map(c=>({club:c.name,pts:0,pj:0,v:0,e:0,d:0,gp:0,gc:0}));
 const money=(n:number)=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
 const pos=(p:Position)=>positions.find(x=>x.value===p)?.label||p;
