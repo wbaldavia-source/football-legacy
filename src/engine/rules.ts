@@ -20,7 +20,7 @@ export function calculateTierMovement(tables:TierTable[],regulations:Competition
   if(!rule)continue;
   const sorted=[...table.rows].sort((a,b)=>b.points-a.points||b.wins-a.wins||(b.goalsFor-b.goalsAgainst)-(a.goalsFor-a.goalsAgainst)||b.goalsFor-a.goalsFor||a.clubName.localeCompare(b.clubName));
   sorted.slice(0,rule.promotionPlaces).forEach(r=>result.push({clubId:r.clubId,clubName:r.clubName,fromTier:table.tier,toTier:Math.max(1,table.tier-1),reason:"direct-promotion"}));
-  sorted.slice(-rule.relegationPlaces).forEach(r=>result.push({clubId:r.clubId,clubName:r.clubName,fromTier:table.tier,toTier:table.tier+1,reason:"direct-relegation"}));
+  if(rule.relegationPlaces>0)sorted.slice(-rule.relegationPlaces).forEach(r=>result.push({clubId:r.clubId,clubName:r.clubName,fromTier:table.tier,toTier:table.tier+1,reason:"direct-relegation"}));
  }
  return result;
 }
