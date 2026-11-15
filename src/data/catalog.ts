@@ -45,6 +45,12 @@ const syncedClubs:Club[]=(liveFootball.teams||[]).map((t:any)=>({
 }));
 const syncedNames=new Set(syncedClubs.map(c=>c.name.toLowerCase()));
 export const clubs:Club[]=[...syncedClubs,...fallbackClubs.filter(c=>!syncedNames.has(c.name.toLowerCase()))];
+type ApiSquadPlayer={id:string;name:string;age:number;number:number|null;position:string;nationality:string|null;source:string};
+export const clubSquads:Record<string,ApiSquadPlayer[]>=(liveFootball as any).squads||{};
+export const footballDataStatus={source:liveFootball.source||"Dados locais",updatedAt:liveFootball.updatedAt||null,
+  leagues:(liveFootball.leagues||[]).length,clubs:(liveFootball.teams||[]).length,
+  squads:Object.keys((liveFootball as any).squads||{}).length,
+  isLive:Boolean(liveFootball.updatedAt&&(liveFootball.teams||[]).length)};
 export const prospects=[
 {name:"João Pedro",age:16,position:"ST" as Position,potential:88,club:"Flamengo",level:"Sub-17" as const},
 {name:"Lucas Martins",age:15,position:"CM" as Position,potential:84,club:"Palmeiras",level:"Sub-15" as const},
