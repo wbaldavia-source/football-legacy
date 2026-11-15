@@ -47,7 +47,7 @@ const syncedNames=new Set(syncedClubs.map(c=>c.name.toLowerCase()));
 export const clubs:Club[]=[...syncedClubs,...fallbackClubs.filter(c=>!syncedNames.has(c.name.toLowerCase()))];
 type ApiSquadPlayer={id:string;name:string;age:number;number:number|null;position:string;nationality:string|null;source:string};
 export const clubSquads:Record<string,ApiSquadPlayer[]>=(liveFootball as any).squads||{};
-export const footballDataStatus={source:liveFootball.source||"Dados locais",updatedAt:liveFootball.updatedAt||null,
+export const footballDataStatus={source:liveFootball.source||"Dados locais",season:(liveFootball as any).season||null,updatedAt:liveFootball.updatedAt||null,
   leagues:(liveFootball.leagues||[]).length,clubs:(liveFootball.teams||[]).length,
   squads:Object.keys((liveFootball as any).squads||{}).length,
   isLive:Boolean(liveFootball.updatedAt&&(liveFootball.teams||[]).length)};
