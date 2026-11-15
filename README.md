@@ -1,32 +1,24 @@
 # FOOTBALL LEGACY – World Career
 
-Starter de desenvolvimento para um simulador web de carreira de futebol masculino.
+Simulador web responsivo de carreira futebolística, em português brasileiro.
 
-## Requisitos
-- Node.js 20+
-- npm 10+
+## Stack
+- Next.js 14 / React 18 / TypeScript
+- Tailwind CSS
+- Salvamento local no navegador (localStorage)
 
 ## Executar localmente
 ```bash
 npm install
 npm run dev
 ```
-Abra http://localhost:3000.
 
-## Estado desta entrega
-Esta é a fundação funcional do projeto: dashboard responsivo, escolha de carreira, decisões com efeitos em atributos/reputação, calendário de temporada simulado e base de tipos para jogadores, treinadores, clubes, ligas e transferências.
+## Build 0.2.0
+- Estrutura Next.js App Router em `app/` e código de domínio em `src/`.
+- Três modalidades selecionáveis: jogador, treinador e dirigente.
+- Configuração de nome, idade, nacionalidade, clube inicial e posição do jogador.
+- Painel e histórico da carreira com salvamento local.
+- Mercado demonstrativo, categorias Sub-15/Sub-17/Sub-20, administração inicial do estádio e painel financeiro.
 
-Ainda não contém base mundial licenciada, autenticação, persistência em nuvem, fotos comerciais ou simulação completa de todas as ligas. Esses recursos exigem integração de dados, infraestrutura e licenças apropriadas. As imagens de jogadores reais não são incluídas sem autorização.
-
-## Próximas integrações
-1. Criar projeto Supabase e preencher `.env.local`.
-2. Implementar autenticação e persistência das carreiras.
-3. Importar dados de competições e clubes de fontes licenciadas/abertas, respeitando termos de uso.
-4. Contratar/licenciar fotos e dados de atletas/técnicos.
-5. Expandir motor de partidas, calendário, finanças, contratos, IA de clubes e mercado.
-6. Deploy na Vercel.
-
-## Estrutura
-- `app/`: interface Next.js.
-- `src/engine/`: regras de carreira e simulação.
-- `src/data/`: dados demonstrativos, substituíveis por provedores licenciados.
+## Limitações importantes
+Este build é uma fundação jogável e demonstrativa, não o jogo completo. Os clubes, jogadores da base, interesses e valores são fictícios. Ainda faltam simulação detalhada de partidas e temporadas, IA de mercado, táticas/escalações, contratos completos, receitas e despesas contabilizadas, autenticação e sincronização em nuvem, dados reais verificados/licenciados, testes automatizados e validação de build. Não há ainda publicação de produção confirmada.
