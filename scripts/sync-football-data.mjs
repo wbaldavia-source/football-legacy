@@ -4,7 +4,7 @@ const key = process.env.API_FOOTBALL_KEY;
 if (!key) throw new Error("API_FOOTBALL_KEY ausente. Configure o secret do repositório.");
 const base = "https://v3.football.api-sports.io";
 let requests = 0;
-const MAX_REQUESTS = Number(process.env.API_FOOTBALL_MAX_REQUESTS || 95);
+const MAX_REQUESTS = Number(process.env.API_FOOTBALL_MAX_REQUESTS || 40);
 const seasonPreference = Number(process.env.FOOTBALL_SEASON || 2026);
 async function api(path) {
   if (requests >= MAX_REQUESTS) throw new Error("Limite de segurança de chamadas atingido.");
@@ -68,7 +68,7 @@ if (!unique.length) throw new Error("A API não retornou clubes. Arquivo anterio
 // Elencos: limitar chamadas para respeitar o plano gratuito e priorizar os clubes do Brasil e ligas selecionadas.
 const priority = unique.sort((a,b) => (a.country==="Brazil"?-1:0)-(b.country==="Brazil"?-1:0));
 const squads = {};
-const squadLimit = Math.min(70, Math.max(0, MAX_REQUESTS - requests - 2));
+const squadLimit = Math.min(22, Math.max(0, MAX_REQUESTS - requests - 1));
 for (const team of priority.slice(0,squadLimit)) {
   try {
     const result = await api("/players/squads?team=" + team.id);
@@ -82,6 +82,6 @@ for (const team of priority.slice(0,squadLimit)) {
 }
 const payload = {source:"API-Football",season:seasonPreference,updatedAt:new Date().toISOString(),
   requestsUsed:requests,leagues,teams:unique,squads,warnings};
-await fs.writeFile("src/data/live-football.json",JSON.stringify(payload,null,2)+"\\n");
+await fs.writeFile("src/data/live-football.json",JSON.stringify(payload,null,2)+"\n");
 console.log("Sincronizados " + unique.length + " clubes, " + Object.keys(squads).length +
   " elencos e " + leagues.length + " competições. Chamadas: " + requests + ". Avisos: " + warnings.length + ".");
