@@ -5,6 +5,7 @@ import {FORMATIONS} from "@/engine/tactics";
 import {NATIONAL_TEAMS} from "@/data/national-teams";
 import type {CareerMode,Position} from "@/engine/types";
 import {createDoubleRoundRobin,simulateFixture,type Fixture} from "@/engine/competition";
+import {simulateDetailedMatch,defaultMatchPlan,type MatchAthlete} from "@/engine/match-engine";
 import {developPlayer,scoutYouth,promoteYouth,runMatchday,postFinance,type PlayerAttributes,type TrainingPlan,type YouthPlayer,type ClubFinance,type Stadium} from "@/engine/career-systems";
 type Stats={apps:number;wins:number;draws:number;losses:number;goals:number;assists:number;minutes:number;yellow:number;red:number;rating:number;points:number;titles:number;transfersIn:number;transfersOut:number;spent:number;earned:number;revenue:number;expenses:number;cleanliness:number;attendance:number};
 type Row={club:string;pts:number;pj:number;v:number;e:number;d:number;gp:number;gc:number};
@@ -72,9 +73,16 @@ function simulate(){
   const midfielders=chosen?chosen.slots.filter(p=>["DM","CM","AM","LM","RM"].includes(p)).length:3;
   const defenders=chosen?chosen.slots.filter(p=>["CB","LB","RB","LWB","RWB"].includes(p)).length:4;
   const tacticalBonus=game.mode==="manager"&&chosen?Math.max(-2.5,Math.min(2.5,(attackers-3)*1.1+(midfielders-3)*.35+(defenders-4)*.25)):0;
-  return simulateFixture(f,
+  const base=simulateFixture(f,
    {id:h.id,name:h.name,strength:65+h.budget/10000000+(h.name===game.club?tacticalBonus:0)},
    {id:a.id,name:a.name,strength:65+a.budget/10000000+(a.name===game.club?tacticalBonus:0)});
+  if(h.name!==game.club&&a.name!==game.club)return base;
+  const ownRoster:MatchAthlete[]=squad.map((p,i)=>({id:"roster-"+i,name:p.n,position:p.p,overall:p.ov||60,fitness:100-(game.trainingLoad||0)*.25,morale:game.morale,age:p.age}));
+  if(game.mode==="player")ownRoster.unshift({id:"career-player",name:game.name,position:game.position,overall:game.overall,fitness:100-(game.trainingLoad||0)*.3,morale:game.morale,age:game.age});
+  const otherRoster:MatchAthlete[]=players.slice(0,18).map((n,i)=>({id:"opponent-"+i,name:n,position:(["GK","CB","CB","LB","RB","DM","CM","CM","AM","LW","RW","ST","ST","CB","CM","ST","LB","RB"] as Position[])[i],overall:58+(i*7)%24,fitness:85,morale:70,age:19+(i%13)}));
+  const plan=defaultMatchPlan(game.formationId||"4-2-3-1");
+  const report=simulateDetailedMatch({seed:f.seed,homeName:h.name,awayName:a.name,homeStrength:65+h.budget/10000000,awayStrength:65+a.budget/10000000,homeRoster:f.homeId===clubs.find(c=>c.name===game.club)?.id?ownRoster:otherRoster,awayRoster:f.awayId===clubs.find(c=>c.name===game.club)?.id?ownRoster:otherRoster,homePlan:plan,awayPlan:defaultMatchPlan()});
+  return {...base,homeGoals:report.homeGoals,awayGoals:report.awayGoals,matchReport:report} as Fixture;
  });
  let myGF=0,myGA=0;
  for(const f of playedFixtures){
@@ -95,10 +103,11 @@ function simulate(){
  const playerDraw=youthCareer?Math.random()<.27:draw;
  const careerWon=game.mode==="player"?playerWin:won;
  const careerDraw=game.mode==="player"?playerDraw:draw;
- const performance=6+Math.random()*3.4;
- const attack=["ST","LW","RW","AM"].includes(game.position);
- const scored=game.mode==="player"?(attack&&Math.random()<.38?1:Math.random()<.12?1:0):0;
- const assisted=game.mode==="player"&&Math.random()<.24?1:0;
+ const report=(playedFixtures.find(f=>f.homeId===clubs.find(c=>c.name===game.club)?.id||f.awayId===clubs.find(c=>c.name===game.club)?.id) as (Fixture&{matchReport?:{homePlayers: {playerId:string;rating:number;goals:number;assists:number;minutes:number;yellowCards:number;redCards:number;injuryDays:number}[];awayPlayers:{playerId:string;rating:number;goals:number;assists:number;minutes:number;yellowCards:number;redCards:number;injuryDays:number}[]}})|undefined)?.matchReport;
+ const careerLine=report?[...report.homePlayers,...report.awayPlayers].find(p=>p.playerId==="career-player"):undefined;
+ const performance=careerLine?.rating??(6+Math.random()*3.4);
+ const scored=game.mode==="player"?(careerLine?.goals??0):0;
+ const assisted=game.mode==="player"?(careerLine?.assists??0):0;
  const st={...game.stats,apps:game.stats.apps+1,
   wins:game.stats.wins+(careerWon?1:0),draws:game.stats.draws+(careerDraw?1:0),
   losses:game.stats.losses+(!careerWon&&!careerDraw?1:0),goals:game.stats.goals+scored,
