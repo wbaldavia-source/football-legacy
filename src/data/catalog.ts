@@ -1,3 +1,4 @@
+import liveFootball from "./live-football.json";
 import type {Club,Position} from "@/engine/types";
 export const positions:{value:Position;label:string}[]=[{value:"GK",label:"Goleiro"},{value:"CB",label:"Zagueiro"},{value:"LB",label:"Lateral esquerdo"},{value:"RB",label:"Lateral direito"},{value:"DM",label:"Volante"},{value:"CM",label:"Meio-campista"},{value:"AM",label:"Meia-atacante"},{value:"LW",label:"Ponta esquerda"},{value:"RW",label:"Ponta direita"},{value:"ST",label:"Centroavante"}];
 // Participantes da Série A 2026 conforme lista oficial da CBF.
@@ -35,7 +36,15 @@ const raw=[
 ["benfica","Benfica","Portugal","Primeira Liga",150000000,"Estádio da Luz",64642],
 ["porto","Porto","Portugal","Primeira Liga",140000000,"Estádio do Dragão",50033]
 ];
-export const clubs:Club[]=raw.map(x=>({id:String(x[0]),name:String(x[1]),country:String(x[2]),league:String(x[3]),budget:Number(x[4]),stadium:String(x[5]),capacity:Number(x[6]),fans:1000000}));
+const fallbackClubs:Club[]=raw.map(x=>({id:String(x[0]),name:String(x[1]),country:String(x[2]),league:String(x[3]),budget:Number(x[4]),stadium:String(x[5]),capacity:Number(x[6]),fans:1000000}));
+const syncedClubs:Club[]=(liveFootball.teams||[]).map((t:any)=>({
+ id:"api-"+String(t.id),name:String(t.name),country:String(t.country),
+ league:String(t.country)==="Brazil"&&String(t.league).toLowerCase()==="serie a"?"Série A":String(t.league),
+ budget:50000000,stadium:String(t.stadium||"Estádio a definir"),
+ capacity:Number(t.capacity||20000),fans:250000
+}));
+const syncedNames=new Set(syncedClubs.map(c=>c.name.toLowerCase()));
+export const clubs:Club[]=[...syncedClubs,...fallbackClubs.filter(c=>!syncedNames.has(c.name.toLowerCase()))];
 export const prospects=[
 {name:"João Pedro",age:16,position:"ST" as Position,potential:88,club:"Flamengo",level:"Sub-17" as const},
 {name:"Lucas Martins",age:15,position:"CM" as Position,potential:84,club:"Palmeiras",level:"Sub-15" as const},
