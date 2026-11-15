@@ -16,7 +16,7 @@ async function api(path) {
   }
   return body.response || [];
 }
-const norm = s => String(s || "").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 const targets = [
   ["Brazil", ["Serie A","Brasileirao Serie A"]],
   ["England", ["Premier League","Championship"]],
