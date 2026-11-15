@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          package-manager-cache: false
       - name: Validate API-Football secret
         env:
           API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
@@ -44,6 +44,6 @@ jobs:
           console.log("API-Football authentication validated. Credential was not printed.");
           NODE
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       - name: Build static site
         run: npm run build
